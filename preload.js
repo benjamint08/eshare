@@ -1,7 +1,9 @@
 const { ipcRenderer, contextBridge } = require("electron");
 
 const API = {
-    requestImages: () => ipcRenderer.send("request-images")
+    requestImages: () => ipcRenderer.send("request-images"),
+    getImageInfo: (name, date) => ipcRenderer.send("image-info", name, date),
+    openInExplorer: (path) => ipcRenderer.send("open-explorer", path)
 }
 
 function removeAllChildNodes(parent) {
@@ -9,6 +11,17 @@ function removeAllChildNodes(parent) {
       parent.removeChild(parent.firstChild);
   }
 }
+
+ipcRenderer.on('image', async (event, message) => {
+  if(message.success === true) {
+    document.getElementById('imageName').innerText = message.name;
+    document.getElementById('imageIMG').src = message.path;
+  } else {
+    const a = document.createElement('a');
+    a.href = "index.html";
+    a.click();
+  }
+});
 
 ipcRenderer.on('images', async (event, message) => {
     if(message.success === true) {
@@ -23,6 +36,7 @@ ipcRenderer.on('images', async (event, message) => {
           // stuff
           const div1 = document.createElement('div');
           div1.classList = "col";
+          div1.style.marginTop = "3em";
           div1.style.height = "8em";
           const div2 = document.createElement('div');
           div2.classList = "card shadow-sm";

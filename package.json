@@ -7,6 +7,9 @@
     "appId": "com.eshare.main",
     "productName": "eshare",
     "copyright": "Copyright © year eshare",
+    "extraResources": [
+      "./img/**"
+    ],
     "mac": {
       "category": "public.app-category.developer-tools",
       "type": "distribution"

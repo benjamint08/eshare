@@ -3,6 +3,7 @@ const os = require('os');
 const path = require('path');
 const fs = require('fs');
 const { app, globalShortcut, shell, Menu, Tray, ipcMain, BrowserWindow  } = require('electron');
+const { execSync } = require('child_process');
 const username = os.userInfo().username;
 let constantPath = "";
 let esharePath = "";
@@ -117,6 +118,40 @@ async function eshareScreen(open = true) {
     }
   });
 }
+
+ipcMain.on('open-explorer', async (event, path) => {
+  const path1 = path.split(path.split('/')[path.split('/').length -1])[0];
+  const path2 = path1.split('file://')[1];
+  if(process.platform === "darwin") {
+    execSync('open ' + path2);
+  }
+  if(process.platform === "win32") {
+    execSync('explore ' + path2);
+  }
+});
+
+ipcMain.on('image-info', async (event, name, date) => {
+  let count = BrowserWindow.getAllWindows()
+  .filter(b => {
+    return b.isFocused()
+  }).length;
+  if(count === 0) {
+    return;
+  }
+  const win = BrowserWindow.getAllWindows()[count -1];
+  const checkPath = esharePath + date + '/' + name;
+  if(fs.existsSync(checkPath)) {
+    win.webContents.send('image', {
+      success: true,
+      name: name,
+      path: checkPath
+    });
+  } else {
+    win.webContents.send('image', {
+      success: false
+    });
+  }
+});
 
 ipcMain.on('request-images', async () => {
   let count = BrowserWindow.getAllWindows()
