@@ -32,11 +32,11 @@ ipcRenderer.on('images', async (event, message) => {
           h4.classList = "card-text text-center";
           h4.style.color = "black";
           const h4a = document.createElement('a');
-          h4a.href = "image.html?name=" + imageName + "&date=" + dates[date];
+          h4a.href = "image.html?name=" + imageName + "&date=" + dates[date].date;
           h4a.innerText = imageName;
           const theImage = document.createElement('img');
           theImage.src = imagePath;
-          theImage.width = "85%";
+          theImage.style.width = "85%";
           theDivToInsertInto.appendChild(div1);
           div1.appendChild(div2);
           div2.appendChild(div3);
