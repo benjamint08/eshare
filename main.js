@@ -93,3 +93,14 @@ async function eshareScreen(open = true) {
     shell.openPath(constantPath + randomName + '.png');
   }
 }
+
+ipcMain.on('request-images', async () => {
+  const win = BrowserWindow.getFocusedWindow();
+  // Get all images and stuff and put the paths into an array of json objects below
+  const arrayOfImages = [];
+  // [{name: 'blabal.png', path: '/Users/test/eshare/2022-2-23/blabal.png'}, etc] ^^
+  win.webContents.send('images', {
+    success: true,
+    images: arrayOfImages
+  });
+});
