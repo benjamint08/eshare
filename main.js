@@ -1,12 +1,39 @@
 const screenshot = require('screenshot-desktop');
 const os = require('os');
 const fs = require('fs');
-const { app, globalShortcut, shell, Menu, Tray } = require('electron');
+const { app, globalShortcut, shell, Menu, Tray, ipcMain, BrowserWindow  } = require('electron');
 const username = os.userInfo().username;
 let constantPath = "";
 let tray = null;
 var today = new Date();
 var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+let win = undefined;
+
+function createWindow() {
+	win = new BrowserWindow({
+		width: 1024,
+		height: 780,
+		webPreferences: {
+			nodeIntegration: true
+		},
+    preload: __dirname + '/preload.js'
+	});
+	win.setMenuBarVisibility(false);
+	win.loadFile("ui/index.html");
+	console.log("Main Menu Launched.")
+}
+
+function main() {
+	createWindow();
+}
+app.whenReady().then(main);
+
+app.on("window-all-closed", function() {
+	if (process.platform !== "darwin") {
+		app.quit();
+	}
+});
+
 
 app.whenReady().then(async () => {
   const ret = globalShortcut.register('Alt+X', async () => {
