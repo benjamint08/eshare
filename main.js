@@ -2,7 +2,7 @@ const screenshot = require('screenshot-desktop');
 const os = require('os');
 const path = require('path');
 const fs = require('fs');
-const { app, globalShortcut, shell, Menu, Tray, ipcMain, BrowserWindow  } = require('electron');
+const { app, globalShortcut, shell, Menu, Tray, ipcMain, BrowserWindow, nativeImage  } = require('electron');
 const { execSync } = require('child_process');
 const username = os.userInfo().username;
 let constantPath = "";
@@ -41,7 +41,7 @@ app.whenReady().then(async () => {
     console.log('registration failed');
   }
 
-  tray = new Tray('./img/tray.png');
+  tray = new Tray(__dirname + nativeImage.createFromPath('./img/tray.png'));
   tray.on('click', async function(e) {
     eshareScreen();
   });
