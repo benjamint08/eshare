@@ -5,6 +5,7 @@ const fs = require('fs');
 const { app, globalShortcut, shell, Menu, Tray, ipcMain, BrowserWindow  } = require('electron');
 const username = os.userInfo().username;
 let constantPath = "";
+let esharePath = "";
 let tray = null;
 var today = new Date();
 var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
@@ -29,7 +30,6 @@ app.on("window-all-closed", function() {
 	}
 });
 
-
 app.whenReady().then(async () => {
   createWindow();
   const ret = globalShortcut.register('Alt+X', async () => {
@@ -51,7 +51,8 @@ app.on('will-quit', () => {
 });
 
 if(process.platform === "darwin") {
-    constantPath = '/Users/' + username + '/eshare/'
+    esharePath = '/Users/' + username + '/eshare/';
+    constantPath = '/Users/' + username + '/eshare/';
     if(!fs.existsSync(constantPath)) {
       fs.mkdirSync(constantPath);
     }
@@ -59,7 +60,8 @@ if(process.platform === "darwin") {
 }
 
 if(process.platform === "win32") {
-    constantPath = 'C:/Users/' + username + '/eshare/'
+    esharePath = 'C:/Users/' + username + '/eshare/';
+    constantPath = 'C:/Users/' + username + '/eshare/';
     if(!fs.existsSync(constantPath)) {
       fs.mkdirSync(constantPath);
     }
@@ -88,15 +90,72 @@ async function eshareScreen(open = true) {
   if(open === true) {
     shell.openPath(constantPath + randomName + '.png');
   }
+  let count = BrowserWindow.getAllWindows()
+  .filter(b => {
+    return b.isFocused()
+  }).length;
+  if(count === 0) {
+    return;
+  }
+  const win = BrowserWindow.getAllWindows()[count -1];
+  let toSend = {
+    success: true,
+    everything: []
+  }
+  getDirectories(esharePath, function(e) {
+    for(var fold in e) {
+      let toAdd = {date: e[fold], images: []};
+      fs.readdir(esharePath + e[fold], function (err, files) {
+        for(var file in files) {
+          if(files[file].endsWith('.png')) {
+            toAdd.images.push({name: files[file], path: esharePath + e[fold] + '/' + files[file]});
+          }
+        }
+        toSend.everything.push(toAdd);
+        win.webContents.send('images', toSend);
+      })
+    }
+  });
 }
 
 ipcMain.on('request-images', async () => {
-  const win = BrowserWindow.getFocusedWindow();
-  // Get all images and stuff and put the paths into an array of json objects below
-  const arrayOfImages = [];
-  // [{name: 'blabal.png', path: '/Users/test/eshare/2022-2-23/blabal.png'}, etc] ^^
-  win.webContents.send('images', {
+  let count = BrowserWindow.getAllWindows()
+  .filter(b => {
+    return b.isFocused()
+  }).length;
+  if(count === 0) {
+    return;
+  }
+  const win = BrowserWindow.getAllWindows()[count -1];
+  let toSend = {
     success: true,
-    images: arrayOfImages
+    everything: []
+  }
+  getDirectories(esharePath, function(e) {
+    for(var fold in e) {
+      let toAdd = {date: e[fold], images: []};
+      fs.readdir(esharePath + e[fold], function (err, files) {
+        for(var file in files) {
+          if(files[file].endsWith('.png')) {
+            toAdd.images.push({name: files[file], path: esharePath + e[fold] + '/' + files[file]});
+          }
+        }
+        toSend.everything.push(toAdd);
+        win.webContents.send('images', toSend);
+      })
+    }
   });
 });
+
+const getDirectories = (source, callback) =>
+  fs.readdir(source, { withFileTypes: true }, (err, files) => {
+    if (err) {
+      callback(err)
+    } else {
+      callback(
+        files
+          .filter(dirent => dirent.isDirectory())
+          .map(dirent => dirent.name)
+      )
+    }
+})
