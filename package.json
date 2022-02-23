@@ -16,7 +16,7 @@
     }
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",    
+    "test": "echo \"Error: no test specified\" && exit 1",
     "build-win": "electron-builder --win",
     "build-osx": "electron-builder --mac",
     "start": "electron ."
@@ -32,6 +32,7 @@
   },
   "homepage": "https://github.com/benjamint08/eshare#readme",
   "dependencies": {
+    "discord-rpc": "^4.0.1",
     "screenshot-desktop": "^1.12.7"
   },
   "devDependencies": {

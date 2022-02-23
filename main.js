@@ -1,7 +1,9 @@
 const screenshot = require('screenshot-desktop');
 const os = require('os');
 const path = require('path');
+const richpresence = true;
 const fs = require('fs');
+const DiscordRPC = require('discord-rpc');
 const { app, globalShortcut, shell, Menu, Tray, ipcMain, BrowserWindow, nativeImage  } = require('electron');
 const { execSync } = require('child_process');
 const username = os.userInfo().username;
@@ -11,6 +13,7 @@ let tray = null;
 var today = new Date();
 var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
 let win = undefined;
+let sessionShots = 0;
 
 function createWindow() {
 	win = new BrowserWindow({
@@ -40,8 +43,7 @@ app.whenReady().then(async () => {
   if (!ret) {
     console.log('registration failed');
   }
-
-  tray = new Tray(__dirname + nativeImage.createFromPath('./img/tray.png'));
+  tray = new Tray(__dirname + '/img/tray.png');
   tray.on('click', async function(e) {
     eshareScreen();
   });
@@ -88,6 +90,10 @@ async function eshareScreen(open = true) {
     randomName = stringRand(7);
   }
   await screenshot({ filename: constantPath + randomName + '.png' });
+  sessionShots++;
+  const randomDescriptions = ['Taking pics', 'Alt+Xing people in 4K', 'Screenshotting NFTs', 'Flash turned on', 'Using eshare']
+  var item = randomDescriptions[Math.floor(Math.random()*randomDescriptions.length)];
+  setActivity('Taken ' + sessionShots.toString() + ' screenshots this session.', item);
   if(open === true) {
     shell.openPath(constantPath + randomName + '.png');
   }
@@ -194,3 +200,28 @@ const getDirectories = (source, callback) =>
       )
     }
 })
+
+const clientId = '946156291401842698';
+const rpc = new DiscordRPC.Client({ transport: 'ipc' });
+const startTimestamp = new Date();
+async function setActivity(details, state) {
+  if (!rpc) {
+    return;
+  }
+  rpc.setActivity({
+    details: details,
+    state: state,
+    startTimestamp,
+    largeImageKey: 'icon',
+    largeImageText: 'eshare',
+    instance: false,
+  });
+}
+
+rpc.on('ready', () => {
+  setActivity('Waiting for something cool to happen...', 'Idling');
+});
+
+if(richpresence === true) {
+  rpc.login({ clientId }).catch(console.error);
+}
