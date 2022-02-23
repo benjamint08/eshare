@@ -1,10 +1,21 @@
 {
   "name": "eshare",
   "version": "1.0.0",
-  "description": "",
+  "description": "eshare is an app that allows you to capture screenshots",
   "main": "main.js",
+  "build": {
+    "appId": "com.eshare.main",
+    "productName": "eshare",
+    "copyright": "Copyright © year eshare",
+    "mac": {
+      "category": "public.app-category.developer-tools",
+      "type": "distribution"
+    }
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "echo \"Error: no test specified\" && exit 1",    
+    "build-win": "electron-builder --win",
+    "build-osx": "electron-builder --mac",
     "start": "electron ."
   },
   "repository": {
@@ -18,7 +29,10 @@
   },
   "homepage": "https://github.com/benjamint08/eshare#readme",
   "dependencies": {
-    "electron": "^17.0.1",
     "screenshot-desktop": "^1.12.7"
+  },
+  "devDependencies": {
+    "electron": "^17.0.1",
+    "electron-builder": "^22.14.13"
   }
 }
