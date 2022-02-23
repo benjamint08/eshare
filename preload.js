@@ -1,6 +1,5 @@
 const { ipcRenderer, contextBridge } = require("electron");
 
-
 const API = {
     requestImages: () => ipcRenderer.send("request-images")
 }

@@ -1,5 +1,6 @@
 const screenshot = require('screenshot-desktop');
 const os = require('os');
+const path = require('path');
 const fs = require('fs');
 const { app, globalShortcut, shell, Menu, Tray, ipcMain, BrowserWindow  } = require('electron');
 const username = os.userInfo().username;
@@ -14,19 +15,13 @@ function createWindow() {
 		width: 1024,
 		height: 780,
 		webPreferences: {
-			nodeIntegration: true
+			nodeIntegration: true,
+      preload: path.join(__dirname, 'preload.js')
 		},
-    preload: __dirname + '/preload.js'
 	});
 	win.setMenuBarVisibility(false);
 	win.loadFile("ui/index.html");
-	console.log("Main Menu Launched.")
 }
-
-function main() {
-	createWindow();
-}
-app.whenReady().then(main);
 
 app.on("window-all-closed", function() {
 	if (process.platform !== "darwin") {
@@ -36,6 +31,7 @@ app.on("window-all-closed", function() {
 
 
 app.whenReady().then(async () => {
+  createWindow();
   const ret = globalShortcut.register('Alt+X', async () => {
     eshareScreen();
   });
