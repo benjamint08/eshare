@@ -9,6 +9,7 @@ const { execSync } = require('child_process');
 const username = os.userInfo().username;
 let constantPath = "";
 let esharePath = "";
+const ncp = require("copy-paste");
 let tray = null;
 var today = new Date();
 var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
@@ -19,6 +20,7 @@ let sessionShots = 0;
 const clientId = '946156291401842698';
 const rpc = new DiscordRPC.Client({ transport: 'ipc' });
 const startTimestamp = new Date();
+let richpresence = false;
 
 function createWindow() {
 	win = new BrowserWindow({
@@ -36,6 +38,7 @@ function createWindow() {
   .executeJavaScript('localStorage.getItem("discordRPC");', true)
   .then(result => {
     if(result === 'true') {
+      richpresence = true;
       rpc.login({ clientId }).catch(console.error);
     }
   });
@@ -106,7 +109,9 @@ async function eshareScreen(open = false) {
   sessionShots++;
   const randomDescriptions = ['Taking pics', 'Alt+Xing people in 4K', 'Screenshotting NFTs', 'Flash turned on', 'Using eshare']
   var item = randomDescriptions[Math.floor(Math.random()*randomDescriptions.length)];
-  setActivity('Taken ' + sessionShots.toString() + ' screenshots this session.', item);
+  if(richpresence === true) {
+    setActivity('Taken ' + sessionShots.toString() + ' screenshots this session.', item);
+  }
   if(open === true) {
     shell.openPath(constantPath + randomName + '.png');
   }
@@ -179,6 +184,10 @@ ipcMain.on('settings', async () => {
 	});
 	win.setMenuBarVisibility(false);
 	win.loadFile("ui/settings.html");
+});
+
+ipcMain.on('copy-clipboard', async (event, text) => {
+  ncp.copy(text);
 });
 
 ipcMain.on('request-images', async () => {

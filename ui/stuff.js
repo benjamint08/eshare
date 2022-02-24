@@ -57,8 +57,7 @@ async function uploadImage(path) {
 
 async function finalPost(toPost, data) {
     formPost(toPost, data, function(c) {
-        const e = JSON.parse(c);
-        console.log(e);
+        window.eshare.copyClipboard(c);
     }, function(e) {
         console.log("error");
     });
