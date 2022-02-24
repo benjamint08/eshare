@@ -149,7 +149,7 @@ ipcMain.on('open-explorer', async (event, path) => {
     execSync('open ' + path2);
   }
   if(process.platform === "win32") {
-    execSync('explore ' + path2);
+    execSync('explorer ' + path2);
   }
 });
 
