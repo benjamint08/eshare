@@ -1,7 +1,6 @@
 const screenshot = require('screenshot-desktop');
 const os = require('os');
 const path = require('path');
-const richpresence = true;
 const fs = require('fs');
 const {FormData} = require('form-data');
 const DiscordRPC = require('discord-rpc');
@@ -16,6 +15,11 @@ var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
 let win = undefined;
 let sessionShots = 0;
 
+// RPC
+const clientId = '946156291401842698';
+const rpc = new DiscordRPC.Client({ transport: 'ipc' });
+const startTimestamp = new Date();
+
 function createWindow() {
 	win = new BrowserWindow({
 		width: 1024,
@@ -28,6 +32,13 @@ function createWindow() {
 	});
 	win.setMenuBarVisibility(false);
 	win.loadFile("ui/index.html");
+  win.webContents
+  .executeJavaScript('localStorage.getItem("discordRPC");', true)
+  .then(result => {
+    if(result === 'true') {
+      rpc.login({ clientId }).catch(console.error);
+    }
+  });
 }
 
 app.on("window-all-closed", function() {
@@ -209,9 +220,6 @@ const getDirectories = (source, callback) =>
     }
 })
 
-const clientId = '946156291401842698';
-const rpc = new DiscordRPC.Client({ transport: 'ipc' });
-const startTimestamp = new Date();
 async function setActivity(details, state) {
   if (!rpc) {
     return;
@@ -229,7 +237,3 @@ async function setActivity(details, state) {
 rpc.on('ready', () => {
   setActivity('Waiting for something cool to happen...', 'Idling');
 });
-
-if(richpresence === true) {
-  rpc.login({ clientId }).catch(console.error);
-}

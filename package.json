@@ -8,7 +8,7 @@
     "productName": "eshare",
     "copyright": "Copyright © year eshare",
     "extraResources": [
-      "./img/**"
+      "img/tray.png"
     ],
     "mac": {
       "category": "public.app-category.developer-tools",

@@ -18,6 +18,8 @@
             <input type="text" id="serverURLPost" name="serverURLPost" class="form-check form-control">
             <label for="customJSON" class="mt-4">Custom JSON (image with "%image%"") <br>Make sure to use double quotes for every key and value.</label><br>
             <input type="text" id="customJSON" name="customJSON" class="form-check form-control" placeholder="{secretKey:'key', image: %image%}">
+            <label for="discordRPC" class="mt-4">Discord Rich Presence</label><br>
+            <input type="checkbox" id="discordRPC" name="discordRPC" class="form-check">
             <div class="text-center mt-4">
                 <button class="btn btn-danger text-center" id="saveBtn">Save</button>
             </div>
@@ -47,10 +49,15 @@
                     document.getElementById('customJSON').value = localStorage.getItem('customJSON');
                 }
 
+                if(localStorage.getItem('discordRPC') !== null) {
+                    document.getElementById('discordRPC').checked = toBool(localStorage.getItem('discordRPC'));
+                }
+
                 document.getElementById('saveBtn').addEventListener('click', function(e) {
                     const uploadServer = document.getElementById('uploadServer');
                     const serverURLPost = document.getElementById('serverURLPost');
                     const customJSON = document.getElementById('customJSON');
+                    const discordRPC = document.getElementById('discordRPC');
                     localStorage.setItem('uploadToServer', uploadServer.checked);
                     if(serverURLPost.value !== "") {
                         localStorage.setItem('postURL', serverURLPost.value);
@@ -58,7 +65,12 @@
                     if(customJSON.value !== "") {
                         localStorage.setItem('customJSON', customJSON.value);
                     }
-                    document.getElementById('tipText').innerText = "Changes saved.";
+                    localStorage.setItem('discordRPC', discordRPC.checked);
+                    if(discordRPC.checked === true) {
+                        document.getElementById('tipText').innerText = "Changes saved. Restart to activate RPC.";
+                    } else {
+                        document.getElementById('tipText').innerText = "Changes saved.";
+                    }
                     setTimeout(function(e) {
                         document.getElementById('tipText').innerText = "Make sure you know what you're doing.";
                     }, 3000);
