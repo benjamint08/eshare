@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="bootstrap.min.css">
+        <title>eshare settings</title>
+        <link rel="stylesheet" href="index.css">
+        <script src="./jquery.min.js"></script>
+        <script src="./stuff.js"></script>
+    </head>
+    <body>
+        <br>
+        <h1 class="text-center">eshare control panel</h1>
+        <h4 class="text-center" id="tipText">Make sure you know what you're doing.</h4>
+        <div class="mt-4 mx-5">
+            <label for="uploadServer">Automatically upload images to remote server</label><br>
+            <input type="checkbox" id="uploadServer" name="uploadServer" class="form-check">
+            <label for="serverURLGet" class="mt-4">Server's upload URL (POST)</label><br>
+            <input type="text" id="serverURLPost" name="serverURLPost" class="form-check form-control">
+            <label for="customJSON" class="mt-4">Custom JSON (image with "%image%"") <br>Make sure to use double quotes for every key and value.</label><br>
+            <input type="text" id="customJSON" name="customJSON" class="form-check form-control" placeholder="{secretKey:'key', image: %image%}">
+            <div class="text-center mt-4">
+                <button class="btn btn-danger text-center" id="saveBtn">Save</button>
+            </div>
+        </div>
+        <div id="scriptsDiv">
+            <script>
+                document.getElementById('customJSON').placeholder = '{"secretKey": "key", "image": "%image%"}';
+                function toBool(str) {
+                    if(str === "false") {
+                        return false;
+                    }
+                    if(str === "true") {
+                        return true;
+                    }
+                    return null;
+                }
+
+                if(localStorage.getItem('uploadToServer') !== null) {
+                    document.getElementById('uploadServer').checked = toBool(localStorage.getItem('uploadToServer'));
+                }
+
+                if(localStorage.getItem('postURL') !== null) {
+                    document.getElementById('serverURLPost').value = localStorage.getItem('postURL');
+                }
+
+                if(localStorage.getItem('customJSON') !== null) {
+                    document.getElementById('customJSON').value = localStorage.getItem('customJSON');
+                }
+
+                document.getElementById('saveBtn').addEventListener('click', function(e) {
+                    const uploadServer = document.getElementById('uploadServer');
+                    const serverURLPost = document.getElementById('serverURLPost');
+                    const customJSON = document.getElementById('customJSON');
+                    localStorage.setItem('uploadToServer', uploadServer.checked);
+                    if(serverURLPost.value !== "") {
+                        localStorage.setItem('postURL', serverURLPost.value);
+                    }
+                    if(customJSON.value !== "") {
+                        localStorage.setItem('customJSON', customJSON.value);
+                    }
+                    document.getElementById('tipText').innerText = "Changes saved.";
+                    setTimeout(function(e) {
+                        document.getElementById('tipText').innerText = "Make sure you know what you're doing.";
+                    }, 3000);
+                });
+            </script>
+        </div>
+    </body>
+</html>

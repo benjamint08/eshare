@@ -33,6 +33,7 @@
   "homepage": "https://github.com/benjamint08/eshare#readme",
   "dependencies": {
     "discord-rpc": "^4.0.1",
+    "form-data": "^4.0.0",
     "screenshot-desktop": "^1.12.7"
   },
   "devDependencies": {

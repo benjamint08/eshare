@@ -3,7 +3,8 @@ const { ipcRenderer, contextBridge } = require("electron");
 const API = {
     requestImages: () => ipcRenderer.send("request-images"),
     getImageInfo: (name, date) => ipcRenderer.send("image-info", name, date),
-    openInExplorer: (path) => ipcRenderer.send("open-explorer", path)
+    openInExplorer: (path) => ipcRenderer.send("open-explorer", path),
+    settings: () => ipcRenderer.send("settings")
 }
 
 function removeAllChildNodes(parent) {

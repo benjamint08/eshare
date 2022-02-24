@@ -3,6 +3,7 @@ const os = require('os');
 const path = require('path');
 const richpresence = true;
 const fs = require('fs');
+const {FormData} = require('form-data');
 const DiscordRPC = require('discord-rpc');
 const { app, globalShortcut, shell, Menu, Tray, ipcMain, BrowserWindow, nativeImage  } = require('electron');
 const { execSync } = require('child_process');
@@ -19,6 +20,7 @@ function createWindow() {
 	win = new BrowserWindow({
 		width: 1024,
 		height: 780,
+    icon: __dirname + "build/icon.png",
 		webPreferences: {
 			nodeIntegration: true,
       preload: path.join(__dirname, 'preload.js')
@@ -81,7 +83,7 @@ function stringRand(length) {
   return result;
 }
 
-async function eshareScreen(open = true) {
+async function eshareScreen(open = false) {
   if(!fs.existsSync(constantPath)) {
     await fs.mkdirSync(constantPath);
   }
@@ -97,18 +99,17 @@ async function eshareScreen(open = true) {
   if(open === true) {
     shell.openPath(constantPath + randomName + '.png');
   }
-  let count = BrowserWindow.getAllWindows()
-  .filter(b => {
-    return b.isFocused()
-  }).length;
+  let count = BrowserWindow.getAllWindows().length;
   if(count === 0) {
     return;
   }
-  const win = BrowserWindow.getAllWindows()[count -1];
+  const win = BrowserWindow.getAllWindows()[0];
   let toSend = {
     success: true,
     everything: []
   }
+  win.webContents
+  .executeJavaScript('uploadImage("' + constantPath + randomName + '.png");', true);
   getDirectories(esharePath, function(e) {
     for(var fold in e) {
       let toAdd = {date: e[fold], images: []};
@@ -137,14 +138,11 @@ ipcMain.on('open-explorer', async (event, path) => {
 });
 
 ipcMain.on('image-info', async (event, name, date) => {
-  let count = BrowserWindow.getAllWindows()
-  .filter(b => {
-    return b.isFocused()
-  }).length;
+  let count = BrowserWindow.getAllWindows().length;
   if(count === 0) {
     return;
   }
-  const win = BrowserWindow.getAllWindows()[count -1];
+  const win = BrowserWindow.getAllWindows()[0];
   const checkPath = esharePath + date + '/' + name;
   if(fs.existsSync(checkPath)) {
     win.webContents.send('image', {
@@ -159,15 +157,25 @@ ipcMain.on('image-info', async (event, name, date) => {
   }
 });
 
+ipcMain.on('settings', async () => {
+  win = new BrowserWindow({
+		width: 600,
+		height: 750,
+    icon: __dirname + "build/icon.png",
+		webPreferences: {
+			nodeIntegration: true
+		},
+	});
+	win.setMenuBarVisibility(false);
+	win.loadFile("ui/settings.html");
+});
+
 ipcMain.on('request-images', async () => {
-  let count = BrowserWindow.getAllWindows()
-  .filter(b => {
-    return b.isFocused()
-  }).length;
+  let count = BrowserWindow.getAllWindows().length;
   if(count === 0) {
     return;
   }
-  const win = BrowserWindow.getAllWindows()[count -1];
+  const win = BrowserWindow.getAllWindows()[0];
   let toSend = {
     success: true,
     everything: []
