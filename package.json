@@ -1,6 +1,6 @@
 {
   "name": "eshare",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "eshare is an app that allows you to capture screenshots",
   "main": "main.js",
   "build": {

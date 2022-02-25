@@ -200,17 +200,29 @@ ipcMain.on('request-images', async () => {
     success: true,
     everything: []
   }
+  let done = 0;
+  let needed = 0;
   getDirectories(esharePath, function(e) {
     for(var fold in e) {
+      needed++;
       let toAdd = {date: e[fold], images: []};
       fs.readdir(esharePath + e[fold], function (err, files) {
+        let done2 = 0;
+        let needed2 = 0;
         for(var file in files) {
+          needed2++;
           if(files[file].endsWith('.png')) {
             toAdd.images.push({name: files[file], path: esharePath + e[fold] + '/' + files[file]});
+            if(needed2 - done2 === 1) {
+              toSend.everything.push(toAdd);
+            }
+            done2++;
           }
         }
-        toSend.everything.push(toAdd);
-        win.webContents.send('images', toSend);
+        if(needed - done === 1) {
+          win.webContents.send('images', toSend);
+        }
+        done++;
       })
     }
   });

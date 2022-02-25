@@ -32,6 +32,7 @@ ipcRenderer.on('images', async (event, message) => {
       const dates = message.everything
       for(var date in dates) {
         for(var image in dates[date].images) {
+          console.log(dates);
           const ourImage = dates[date].images[image];
           const imageName = ourImage.name;
           const imagePath = ourImage.path;
